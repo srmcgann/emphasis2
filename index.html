@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>moar emphasis</title>
+    <style>
+      /* latin-ext */
+      @font-face {
+        font-family: 'Courier Prime';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/courierprime/v9/u-450q2lgwslOqpF_6gQ8kELaw9pWt_-.woff2) format('woff2');
+        unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Courier Prime';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(https://fonts.gstatic.com/s/courierprime/v9/u-450q2lgwslOqpF_6gQ8kELawFpWg.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      body,html{
+        background: #000;
+        margin: 0;
+        font-family: 'Courier Prime';
+        height: 100vh;
+        overflow: hidden;
+      }
+      #c{
+        border: 3px solid #40f4;
+        position: absolute;
+        background: #40f1;
+        left: 50%;
+        top: 50%;
+        border-radius: 10px;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <script>
+      c = document.querySelector('#c')
+      c.width = 1920
+      c.height = 1080
+      x = c.getContext('2d')
+      C = Math.cos
+      S = Math.sin
+      t = 0
+      T = Math.tan
+
+      rsz = window.onresize = () =>{
+        let b = document.body
+        let margin = 10
+        let n
+        let d = .5625
+        if(b.clientHeight/b.clientWidth > d){
+          c.style.width = `${(n=b.clientWidth) - margin*2}px`
+          c.style.height = `${n*d - margin*2}px`
+        }else{
+          c.style.height = `${(n=b.clientHeight) - margin*2}px`
+          c.style.width = `${n/d - margin*2}px`
+        }
+      }
+
+      rsz()
+
+      async function Draw(){
+        if(!t){
+          Rn = Math.random
+          R = (Rl,Pt,Yw,m) => {
+            M = Math
+            A = M.atan2
+            H = M.hypot
+            X = S(p=A(X,Y)+Rl) * (d=H(X,Y))
+            Y = C(p) * d
+            X = S(p=A(X,Z)+Yw) * (d=H(X,Z))
+            Z = C(p)*d
+            Y = S(p=A(Y,Z)+Pt) * (d=H(Y,Z))
+            Z = C(p)*d
+            if(m){
+              X+=oX
+              Y+=oY
+              Z+=oZ
+            }
+          }
+          
+          Q = () => [c.width/2+X/Z*800, c.height/2+Y/Z*800]
+          I=(A,B,M,D,E,F,G,H)=>(K=((G-E)*(B-F)-(H-F)*(A-E))/(J=(H-F)*(M-A)-(G-E)*(D-B)))>=0&&K<=1&&(L=((M-A)*(B-F)-(D-B)*(A-E))/J)>=0&&L<=1?[A+K*(M-A),B+K*(D-B)]:0
+          
+          Normal = (facet, autoFlipNormals=false, X1=0, Y1=0, Z1=0) => {
+            let ax = 0, ay = 0, az = 0
+            facet.map(q_=>{ ax += q_[0], ay += q_[1], az += q_[2] })
+            ax /= facet.length, ay /= facet.length, az /= facet.length
+            let b1 = facet[2][0]-facet[1][0], b2 = facet[2][1]-facet[1][1], b3 = facet[2][2]-facet[1][2]
+            let c1 = facet[1][0]-facet[0][0], c2 = facet[1][1]-facet[0][1], c3 = facet[1][2]-facet[0][2]
+            crs = [b2*c3-b3*c2,b3*c1-b1*c3,b1*c2-b2*c1]
+            d = Math.hypot(...crs)+.001
+            let nls = 1 //normal line length
+            crs = crs.map(q=>q/d*nls)
+            let X1_ = ax, Y1_ = ay, Z1_ = az
+            let flip = 1
+            if(autoFlipNormals){
+              let d1_ = Math.hypot(X1_-X1,Y1_-Y1,Z1_-Z1)
+              let d2_ = Math.hypot(X1-(ax + crs[0]/99),Y1-(ay + crs[1]/99),Z1-(az + crs[2]/99))
+              flip = d2_>d1_?-1:1
+            }
+            let X2_ = ax + (crs[0]*=flip), Y2_ = ay + (crs[1]*=flip), Z2_ = az + (crs[2]*=flip)
+            return [X1_, Y1_, Z1_, X2_, Y2_, Z2_]
+          }
+            
+          lineFaceI = (X1, Y1, Z1, X2, Y2, Z2, facet, autoFlipNormals=false, showNormals=false) => {
+            let X_, Y_, Z_, d, m, l_,K,J,L,p
+            let I_=(A,B,M,D,E,F,G,H)=>(K=((G-E)*(B-F)-(H-F)*(A-E))/(J=(H-F)*(M-A)-(G-E)*(D-B)))>=0&&K<=1&&(L=((M-A)*(B-F)-(D-B)*(A-E))/J)>=0&&L<=1?[A+K*(M-A),B+K*(D-B)]:0
+            let Q_=()=>[c.width/2+X_/Z_*600,c.height/2+Y_/Z_*600]
+            let R_ = (Rl,Pt,Yw,m)=>{
+              let M=Math, A=M.atan2, H=M.hypot
+              X_=S(p=A(X_,Y_)+Rl)*(d=H(X_,Y_)),Y_=C(p)*d,X_=S(p=A(X_,Z_)+Yw)*(d=H(X_,Z_)),Z_=C(p)*d,Y_=S(p=A(Y_,Z_)+Pt)*(d=H(Y_,Z_)),Z_=C(p)*d
+              if(m){ X_+=oX,Y_+=oY,Z_+=oZ }
+            }
+            let rotSwitch = m =>{
+              switch(m){
+                case 0: R_(0,0,Math.PI/2); break
+                case 1: R_(0,Math.PI/2,0); break
+                case 2: R_(Math.PI/2,0,Math.PI/2); break
+              }        
+            }
+            let [X1_, Y1_, Z1_, X2_, Y2_, Z2_] = Normal(facet, autoFlipNormals, X1, Y1, Z1)
+            if(showNormals){
+              x.beginPath()
+              X_ = X1_, Y_ = Y1_, Z_ = Z1_
+              R_(Rl,Pt,Yw,1)
+              if(Z_>0) x.lineTo(...Q_())
+              X_ = X2_, Y_ = Y2_, Z_ = Z2_
+              R_(Rl,Pt,Yw,1)
+              if(Z_>0) x.lineTo(...Q_())
+              x.lineWidth = 5
+              x.strokeStyle='#f004'
+              x.stroke()
+            }
+
+            let p1_ = Math.atan2(X2_-X1_,Z2_-Z1_)
+            let p2_ = -(Math.acos((Y2_-Y1_)/(Math.hypot(X2_-X1_,Y2_-Y1_,Z2_-Z1_)+.001))+Math.PI/2)
+            let isc = false, iscs = [false,false,false]
+            X_ = X1, Y_ = Y1, Z_ = Z1
+            R_(0,-p2_,-p1_)
+            let rx_ = X_, ry_ = Y_, rz_ = Z_
+            for(let m=3;m--;){
+              if(isc === false){
+                X_ = rx_, Y_ = ry_, Z_ = rz_
+                rotSwitch(m)
+                X1_ = X_, Y1_ = Y_, Z1_ = Z_ = 5, X_ = X2, Y_ = Y2, Z_ = Z2
+                R_(0,-p2_,-p1_)
+                rotSwitch(m)
+                X2_ = X_, Y2_ = Y_, Z2_ = Z_
+                facet.map((q_,j_)=>{
+                  if(isc === false){
+                    let l = j_
+                    X_ = facet[l][0], Y_ = facet[l][1], Z_ = facet[l][2]
+                    R_(0,-p2_,-p1_)
+                    rotSwitch(m)
+                    let X3_=X_, Y3_=Y_, Z3_=Z_
+                    l = (j_+1)%facet.length
+                    X_ = facet[l][0], Y_ = facet[l][1], Z_ = facet[l][2]
+                    R_(0,-p2_,-p1_)
+                    rotSwitch(m)
+                    let X4_ = X_, Y4_ = Y_, Z4_ = Z_
+                    if(l_=I_(X1_,Y1_,X2_,Y2_,X3_,Y3_,X4_,Y4_)) iscs[m] = l_
+                  }
+                })
+              }
+            }
+            if(iscs.filter(v=>v!==false).length==3){
+              let iscx = iscs[1][0], iscy = iscs[0][1], iscz = iscs[0][0]
+              let pointInPoly = true
+              ax=0, ay=0, az=0
+              facet.map((q_, j_)=>{ ax+=q_[0], ay+=q_[1], az+=q_[2] })
+              ax/=facet.length, ay/=facet.length, az/=facet.length
+              X_ = ax, Y_ = ay, Z_ = az
+              R_(0,-p2_,-p1_)
+              X1_ = X_, Y1_ = Y_, Z1_ = Z_
+              X2_ = iscx, Y2_ = iscy, Z2_ = iscz
+              facet.map((q_,j_)=>{
+                if(pointInPoly){
+                  let l = j_
+                  X_ = facet[l][0], Y_ = facet[l][1], Z_ = facet[l][2]
+                  R_(0,-p2_,-p1_)
+                  let X3_ = X_, Y3_ = Y_, Z3_ = Z_
+                  l = (j_+1)%facet.length
+                  X_ = facet[l][0], Y_ = facet[l][1], Z_ = facet[l][2]
+                  R_(0,-p2_,-p1_)
+                  let X4_ = X_, Y4_ = Y_, Z4_ = Z_
+                  if(I_(X1_,Y1_,X2_,Y2_,X3_,Y3_,X4_,Y4_)) pointInPoly = false
+                }
+              })
+              if(pointInPoly){
+                X_ = iscx, Y_ = iscy, Z_ = iscz
+                R_(0,p2_,0)
+                R_(0,0,p1_)
+                isc = [[X_,Y_,Z_], [crs[0],crs[1],crs[2]]]
+              }
+            }
+            return isc
+          }
+
+          Cube = size => {
+            for(r=[],i=6;i--;r=[...r,b])for(b=[],j=4;j--;)b=[...b,[(a=[S(p=Math.PI*2/4*j+Math.PI/4),C(p),2**.5/2])[i%3]*(l=size*(i<3?1:-1)),a[(i+1)%3]*l,a[(i+2)%3]*l]]
+            return r
+          }
+          
+          burst = new Image()
+          burst.src = "https://srmcgann.github.io/temp/burst.png"
+
+          stroke = (scol, fcol, lw, dl, oga=1, ocp=true) => {
+            if(scol){
+              x.strokeStyle = scol
+              if(ocp) x.closePath()
+              x.lineWidth = Math.min(100, 100/Z*lw)
+              if(dl){
+                x.globalAlpha = .25 * oga
+                x.stroke()
+                x.lineWidth/=5
+              }
+              x.globalAlpha = 1*oga
+              x.stroke()
+            }
+            if(fcol){
+              x.globalAlpha = 1*oga
+              x.fillStyle = fcol
+              x.fill()
+            }
+          }
+          l = location.href.split('?c=')
+          if(l.length>1){
+            renderText = l[1]
+          }else{
+            renderText = 'equal rights\nis not\nequal access'
+          }
+          
+          bg = new Image()
+          bg.src = 'https://srmcgann.github.io/photography/fc402d02cd642483899593e8803319d1.jpg'
+          
+          buffer = document.createElement('canvas')
+          bctx = buffer.getContext('2d')
+          genDots = (size, text) => {
+            P = []
+            let l = text.split('\n')
+            let rows = l.length
+            buffer.width = 1e3
+            buffer.height = 1e3
+            bctx.font = (fs = 70) + 'px Courier Prime'
+            bctx.fillStyle = '#000'
+            bctx.fillRect(0, 0, buffer.width, buffer.height)
+            bctx.fillStyle = '#fff'
+            bctx.textAlign = 'center'
+            l.map((v, i) => {
+              bctx.fillText(v, buffer.width/2, buffer.height/2-(rows/2-1)*fs+fs*i-fs/3)
+            })
+            let data = bctx.getImageData(0, 0, buffer.width, buffer.height)
+            let a = []
+            let scale = .03
+            for(let i=0; i<data.data.length; i+=4){
+              tx = (i/4|0)%buffer.width
+              ty = (i/4|0)/buffer.width|0
+              l = data.data
+              red   = l[i+0]
+              green = l[i+1]
+              blue  = l[i+2]
+              alpha = l[i+3]
+              if((lum = (red+green+blue)/3)>128){
+                a = [...a, [(buffer.width/2-tx)*scale, (buffer.height/2-ty)*scale, 0]]
+              }
+            }
+            if(a.length<size){
+              do{
+                a = [...a, [...a[Rn()*a.length|0]]]
+              }while(a.length<size);
+            }else{
+              do{
+                cull = Rn() * a.length|0
+                a = a.filter((v, i) => i!=cull)
+              }while(a.length>size);
+            }
+            P = a
+          }
+          
+          iBc = 3e3
+          height = 10/6
+          width = 10
+          variance = .25
+          genDots(iBc, renderText)
+          B = Array(iBc).fill().map((v, i) => {
+            polarity = Rn()<.5
+            theta = polarity ? 0 : Math.PI
+            X = -width / 2 + width/iBc*i + (Rn()-.5)*variance
+            Y = S(p=Math.PI*4/iBc*i+theta) * height + (Rn()-.5)*variance
+            Z = C(p) * height + (Rn()-.5)*variance
+            vx = vy = vz = 0
+            return [X, Y, Z, vx, vy, vz, ...P[i], X,Y,Z, polarity]
+          })
+        }
+        
+        x.globalAlpha = .066
+        x.drawImage(bg,0,0,c.width,c.height)
+        x.globalAlpha = 1
+        x.fillStyle = '#0004'
+        x.fillRect(0,0,c.width,c.height)
+        x.lineJoin = x.lineCap = 'roud'
+        
+        oX=0, oY=0, oZ=10
+        Rl=0, Pt=S(t*2)/2+Math.PI
+        Yw=Math.PI + S(t)/2 + Math.min(Math.PI*2, Math.max(0, (.3+C(t/3))*Math.PI*4))
+        
+        ip1 = Math.min(1, Math.max(0, (.3+C(t/4))*10))
+        ip2 = 1-ip1
+        elasticity = 100
+        B.map(v=>{
+          X = v[9]
+          Y = v[10]
+          Z = v[11]
+          R(0, .05, 0)
+          v[9] = X
+          v[10] = Y
+          v[11] = Z
+          v[3] /= 1.15
+          v[4] /= 1.15
+          v[5] /= 1.15
+          tx = v[6] * ip1 + v[9] * ip2
+          ty = v[7] * ip1 + v[10] * ip2
+          tz = v[8] * ip1 + v[11] * ip2
+          v[3] += (tx - v[0]) / elasticity
+          v[4] += (ty - v[1]) / elasticity
+          v[5] += (tz - v[2]) / elasticity
+          X = v[0] += v[3]
+          Y = v[1] += v[4]
+          Z = v[2] += v[5]
+          R(Rl,Pt,Yw,1)
+          if(Z>0){
+            l = Q()
+            s = Math.min(1e3, 200/Z)
+            x.fillStyle = v[12] ? '#4400ff06' : '#00ff0006'
+            x.fillRect(l[0]-s/2,l[1]-s/2,s,s)
+            s/=3
+            x.fillStyle = v[12] ? '#ff000015' : '#00ffff15'
+            x.fillRect(l[0]-s/2,l[1]-s/2,s,s)
+            s/=3
+            x.fillStyle = '#ffffffff'
+            x.fillRect(l[0]-s/2,l[1]-s/2,s,s)
+          }
+        })
+        
+        t+=1/60
+        requestAnimationFrame(Draw)
+      }
+      Draw()
+    </script>
+  </body>
+</html>
