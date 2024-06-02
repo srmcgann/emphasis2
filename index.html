@@ -234,7 +234,7 @@
           }
           l = location.href.split('?c=')
           if(l.length>1){
-            renderText = l[1]
+            renderText = l[1].replaceAll('%20','\n')
           }else{
             renderText = 'equal rights\nis not\nequal access'
           }
