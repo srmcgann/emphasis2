@@ -256,7 +256,7 @@
             bctx.fillStyle = '#fff'
             bctx.textAlign = 'center'
             l.map((v, i) => {
-              bctx.fillText(v, buffer.width/2, buffer.height/2-(rows/2-1)*fs+fs*i-fs/3)
+              bctx.fillText(v, buffer.width/2, buffer.height/2-(rows/2-1)*fs+fs*i-fs/6)
             })
             let data = bctx.getImageData(0, 0, buffer.width, buffer.height)
             let a = []
@@ -290,6 +290,7 @@
           height = 10/6
           width = 10
           variance = .25
+          ls = 2
           genDots(iBc, renderText)
           B = Array(iBc).fill().map((v, i) => {
             polarity = Rn()<.5
@@ -298,7 +299,7 @@
             Y = S(p=Math.PI*4/iBc*i+theta) * height + (Rn()-.5)*variance
             Z = C(p) * height + (Rn()-.5)*variance
             vx = vy = vz = 0
-            return [X, Y, Z, vx, vy, vz, ...P[i], X,Y,Z, polarity]
+            return [X, Y, Z, vx, vy, vz, ...P[i], X*ls,Y*ls,Z*ls, polarity]
           })
         }
         
@@ -313,7 +314,7 @@
         Rl=0, Pt=S(t*2)/2+Math.PI
         Yw=Math.PI + S(t)/2 + Math.min(Math.PI*2, Math.max(0, (.3+C(t/3))*Math.PI*4))
         
-        ip1 = Math.min(1, Math.max(0, (.3+C(t/4))*10))
+        ip1 = Math.min(1, Math.max(0, (.3+C(t/4))*4))
         ip2 = 1-ip1
         elasticity = 100
         B.map(v=>{
