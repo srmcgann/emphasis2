@@ -290,7 +290,7 @@
           height = 10/6
           width = 10
           variance = .25
-          ls = 2
+          ls = 1.5
           genDots(iBc, renderText)
           B = Array(iBc).fill().map((v, i) => {
             polarity = Rn()<.5
@@ -316,7 +316,7 @@
         
         ip1 = Math.min(1, Math.max(0, (.3+C(t/4))*4))
         ip2 = 1-ip1
-        elasticity = 100
+        elasticity = 50
         B.map(v=>{
           X = v[9]
           Y = v[10]
@@ -340,7 +340,7 @@
           R(Rl,Pt,Yw,1)
           if(Z>0){
             l = Q()
-            s = Math.min(1e3, 200/Z)
+            s = Math.min(1e3, 250/Z)
             x.fillStyle = v[12] ? '#4400ff06' : '#00ff0006'
             x.fillRect(l[0]-s/2,l[1]-s/2,s,s)
             s/=3
